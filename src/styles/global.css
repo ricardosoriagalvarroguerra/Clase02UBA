@@ -1,0 +1,420 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  overflow: hidden;
+}
+
+body {
+  min-width: 320px;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text);
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Deck scroll-snap */
+.deck {
+  height: 100dvh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+.deck::-webkit-scrollbar { display: none; }
+
+.slide {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  min-height: 100svh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--slide-block-pad) var(--slide-inline-pad);
+  padding-bottom: calc(var(--slide-block-pad) + 64px);
+  overflow: visible;
+}
+
+.slide__inner {
+  width: 100%;
+  max-width: var(--content-max-width);
+  min-width: 0;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+}
+
+.slide__inner > * {
+  min-width: 0;
+}
+
+.slide[data-active='true'] .slide__inner {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Barra lateral de progreso */
+.progress {
+  position: fixed;
+  right: var(--space-6);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+.progress__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  padding: 0;
+  transition: all 240ms var(--ease-out);
+}
+.progress__dot[data-active='true'] {
+  background: var(--color-primary);
+  transform: scale(1.4);
+}
+
+/* Controles flecha */
+.nav-controls {
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--space-3);
+  z-index: 10;
+}
+.nav-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 1.1rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 180ms var(--ease-out), background 180ms var(--ease-out);
+}
+.nav-btn:hover { background: var(--color-surface-alt); transform: translateY(-2px); }
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.slide-counter {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  letter-spacing: var(--tracking-wide);
+  z-index: 10;
+}
+
+.nav-controls,
+.slide-counter,
+.progress {
+  user-select: none;
+}
+
+@media (max-width: 1100px) {
+  .progress {
+    display: none;
+  }
+}
+
+@media (max-height: 820px) and (min-width: 900px) {
+  .slide {
+    align-items: flex-start;
+    padding-top: var(--slide-block-pad);
+    padding-bottom: calc(var(--slide-block-pad) + 56px);
+  }
+
+  .nav-controls,
+  .slide-counter {
+    bottom: var(--space-4);
+  }
+}
+
+@media (max-width: 760px) {
+  .slide {
+    align-items: flex-start;
+    padding: var(--slide-block-pad) var(--slide-inline-pad);
+    padding-bottom: calc(var(--slide-block-pad) + 64px);
+  }
+
+  .progress {
+    display: none;
+  }
+
+  .slide-counter {
+    right: var(--space-4);
+  }
+}
+
+@media (max-width: 560px) {
+  .nav-controls {
+    bottom: var(--space-4);
+  }
+
+  .nav-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .slide-counter {
+    bottom: var(--space-4);
+    font-size: 0.68rem;
+  }
+}
+
+/* Responsive deck refinements */
+.slide__inner > :is(
+  .mf,
+  .pct,
+  .sd,
+  .rgp,
+  .exp,
+  .infl-concept,
+  .ipc-bk,
+  .infl-form,
+  .cpid,
+  .rwage,
+  .rwh,
+  .wig,
+  .pov,
+  .sbs,
+  .plg,
+  .infl-slide
+) {
+  max-width: min(100%, var(--content-max-width));
+}
+
+:is(
+  .mf__actions,
+  .pct__actions,
+  .rgp__actions,
+  .exp__actions,
+  .ipc-bk__actions,
+  .infl-form__actions,
+  .cpid__actions,
+  .rwage__actions
+) {
+  padding-right: 0;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+:is(.pct__example, .pct__warnings, .exp__example, .rwage__example):not([data-visible='true']) {
+  display: none;
+}
+
+:is(.pct__actions, .exp__actions, .rwage__actions) {
+  margin-top: var(--space-1);
+}
+
+:is(
+  .mf__btn,
+  .pct__btn,
+  .rgp__btn,
+  .exp__btn,
+  .ipc-bk__btn,
+  .infl-form__btn,
+  .cpid__btn,
+  .rwage__btn,
+  .infl-concept__btn
+) {
+  min-height: 40px;
+  white-space: normal;
+}
+
+:is(
+  .infl-slide__chart,
+  .sd__chart-wrap,
+  .pov__chart-wrap,
+  .rwh__chart-wrap,
+  .wig__chart-wrap,
+  .plg__chart-wrap
+) {
+  width: 100%;
+  min-width: 0;
+}
+
+:is(
+  .infl-slide__chart,
+  .sd__chart-wrap,
+  .pov__chart-wrap,
+  .rwh__chart-wrap,
+  .wig__chart-wrap,
+  .plg__chart-wrap
+) > svg {
+  width: 100%;
+  min-width: 0;
+}
+
+:is(
+  .infl-chart__axis text,
+  .sd-chart__axis text,
+  .pov-chart__axis text,
+  .rwh-chart__axis text,
+  .wig-chart__axis text,
+  .plg-chart__axis text
+) {
+  font-size: 12px;
+}
+
+:is(
+  .infl-chart__y-label,
+  .sd-chart__axis-label,
+  .pov-chart__y-label,
+  .rwh-chart__y-label,
+  .wig-chart__y-label,
+  .plg-chart__y-label,
+  .rwh-chart__base-label
+) {
+  font-size: 12px;
+}
+
+@media (min-width: 1360px) and (min-height: 820px) {
+  :is(.mf__grid, .rgp__grid, .exp__main, .cpid__grid) {
+    gap: var(--space-6);
+  }
+
+  :is(.sd__layout, .pct__grid, .infl-form__grid, .rwage__grid) {
+    gap: var(--space-6);
+  }
+
+  :is(.sbs__footer, .plg__insight, .rwh__stats, .rwh__milestones-grid) {
+    gap: var(--space-4);
+  }
+}
+
+@media (min-width: 760px) and (max-width: 1180px) {
+  :is(.mf__grid, .sbs__footer, .plg__insight) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mf__card:last-child,
+  .sbs__metric:last-child,
+  .plg__insight-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  :is(.pct__grid, .infl-form__grid, .rwage__grid, .sd__layout) {
+    grid-template-columns: 1fr;
+  }
+
+  :is(.pct__eq, .infl-form__eq, .rwage__eq) {
+    min-height: 140px;
+  }
+}
+
+@media (max-width: 980px) {
+  :is(.cpid__grid, .rgp__grid, .exp__main, .infl-concept) {
+    grid-template-columns: 1fr;
+  }
+
+  :is(.cpid__card, .rgp__card, .mf__card) {
+    padding: var(--space-4);
+  }
+
+  :is(.pov__controls, .infl-slide__controls) {
+    align-items: flex-start;
+  }
+
+  :is(.pov-toggle, .infl-toggle) {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 760px) {
+  :is(
+    .mf__actions,
+    .pct__actions,
+    .rgp__actions,
+    .exp__actions,
+    .ipc-bk__actions,
+    .infl-form__actions,
+    .cpid__actions,
+    .rwage__actions
+  ) {
+    justify-content: flex-start;
+  }
+
+  :is(.pct__eq, .infl-form__eq, .rwage__eq) {
+    font-size: clamp(1.35rem, 7vw, 2rem);
+    min-height: 0;
+    overflow-wrap: anywhere;
+  }
+
+  :is(.pct-eq__num, .pct-eq__den, .ife__num, .ife__den, .rwe__num, .rwe__den) {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  :is(.sd__scenarios, .sd__metrics, .sbs__footer, .rwh__milestones-grid) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 900px) {
+  :is(.home__subtitle, .section__title, .mf__lead, .pct__lead, .sd__lead, .rgp__lead, .exp__lead, .infl-form__lead, .cpid__lead, .rwage__lead, .sbs__lead) {
+    line-height: 1.3;
+  }
+
+  :is(.infl-slide__chart, .pov__chart-wrap, .rwh__chart-wrap, .wig__chart-wrap, .plg__chart-wrap) {
+    padding: var(--space-2);
+  }
+}
+
+@media (min-width: 1000px) and (max-width: 1180px) and (max-height: 820px) {
+  .sd__layout {
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  }
+
+  .sd__scenarios {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sbs__footer {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sbs__metric:last-child {
+    grid-column: auto;
+  }
+}

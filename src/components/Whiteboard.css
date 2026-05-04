@@ -1,0 +1,181 @@
+.wb {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #fafaf6;
+  display: flex;
+  flex-direction: column;
+  animation: wb-fade-in 180ms var(--ease-out);
+}
+
+@keyframes wb-fade-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.wb__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+.wb__group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  background: var(--color-surface-alt);
+  border-radius: 999px;
+}
+
+.wb__spacer { flex: 1; }
+
+.wb__tool,
+.wb__btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), border-color 160ms var(--ease-out);
+}
+.wb__tool:hover,
+.wb__btn:hover { background: var(--color-surface); }
+.wb__tool[data-active='true'] {
+  background: var(--color-primary);
+  color: #fff;
+}
+.wb__btn { font-size: 1rem; }
+.wb__btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.wb__btn--danger {
+  width: auto;
+  padding: 0 14px;
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+}
+.wb__btn--danger:hover { background: rgba(163, 59, 42, 0.08); }
+
+.wb__color {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 2px solid var(--color-surface-alt);
+  padding: 0;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), border-color 160ms var(--ease-out);
+}
+.wb__color:hover { transform: scale(1.08); }
+.wb__color[data-active='true'] {
+  border-color: var(--color-text);
+  transform: scale(1.12);
+}
+
+.wb__size {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out);
+}
+.wb__size:hover { background: var(--color-surface); }
+.wb__size[data-active='true'] {
+  background: var(--color-surface);
+  border-color: var(--color-primary);
+}
+.wb__size-dot {
+  display: inline-block;
+  background: var(--color-text);
+  border-radius: 999px;
+}
+
+.wb__close {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  border: 1px solid var(--color-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  letter-spacing: 0.02em;
+  transition: background 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+.wb__close:hover {
+  background: var(--color-primary-soft);
+  transform: translateY(-1px);
+}
+
+.wb__canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(31, 78, 74, 0.10) 1px, transparent 1px) 0 0 / 24px 24px,
+    #fafaf6;
+}
+
+.wb__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+.wb__canvas[data-tool='pen'] { cursor: crosshair; }
+.wb__canvas[data-tool='eraser'] { cursor: cell; }
+
+.wb-toggle {
+  position: fixed;
+  bottom: var(--space-6);
+  left: var(--space-6);
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  box-shadow: var(--shadow-sm);
+  transition: background 180ms var(--ease-out), transform 180ms var(--ease-out);
+  user-select: none;
+}
+.wb-toggle:hover {
+  background: var(--color-surface-alt);
+  transform: translateY(-1px);
+}
+.wb-toggle__icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 760px) {
+  .wb-toggle {
+    bottom: var(--space-4);
+    left: var(--space-4);
+    padding: 6px 12px;
+    font-size: var(--text-xs);
+  }
+  .wb__toolbar { padding: var(--space-2) var(--space-3); gap: var(--space-2); }
+  .wb__tool, .wb__btn { width: 32px; height: 32px; }
+}
