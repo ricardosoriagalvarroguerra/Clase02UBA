@@ -64,7 +64,7 @@ export function LawyerHookSlide({ isActive }: Props) {
     <div className="lhk">
       <header className="lhk__header">
         <p className="lhk__eyebrow">Antes de empezar · ¿por qué nos importa?</p>
-        <h2 className="lhk__title">La inflación no es un tema de economistas</h2>
+        <h2 className="lhk__title">La inflación no es un tema de solo de economistas</h2>
         <p className="lhk__lead">
           Para un abogado en Argentina, los precios y la inflación atraviesan
           casi todas las áreas del derecho patrimonial. No vamos a aprender
