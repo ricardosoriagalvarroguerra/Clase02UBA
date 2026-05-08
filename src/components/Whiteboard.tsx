@@ -6,10 +6,12 @@ interface Props {
   onClose: () => void
 }
 
-type Tool = 'pen' | 'eraser'
+type Tool = 'pen' | 'eraser' | 'text'
 
 const COLORS = ['#1a2e2b', '#1f4e4a', '#a33b2a', '#c89f3c', '#2563eb'] as const
 const SIZES = [2, 4, 8, 14] as const
+
+const fontPxFor = (size: number) => Math.round(14 + size * 3.2)
 
 export function Whiteboard({ open, onClose }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -23,6 +25,8 @@ export function Whiteboard({ open, onClose }: Props) {
   const [color, setColor] = useState<string>(COLORS[0])
   const [size, setSize] = useState<number>(SIZES[1])
   const [, forceUpdate] = useState(0)
+  const [textBox, setTextBox] = useState<{ x: number; y: number; value: string } | null>(null)
+  const textInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -74,6 +78,12 @@ export function Whiteboard({ open, onClose }: Props) {
     ro.observe(wrap)
     return () => ro.disconnect()
   }, [open])
+
+  useEffect(() => {
+    if (textBox && textInputRef.current) {
+      textInputRef.current.focus()
+    }
+  }, [textBox])
 
   const pushSnapshot = () => {
     const canvas = canvasRef.current
@@ -144,9 +154,42 @@ export function Whiteboard({ open, onClose }: Props) {
     return { x: e.clientX - rect.left, y: e.clientY - rect.top }
   }
 
+  const commitTextBox = () => {
+    setTextBox((prev) => {
+      if (!prev) return null
+      const value = prev.value.trim()
+      if (!value) return null
+      const canvas = canvasRef.current
+      if (!canvas) return null
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return null
+      pushSnapshot()
+      const px = fontPxFor(size)
+      ctx.save()
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.fillStyle = color
+      const cssFont = getComputedStyle(canvas).getPropertyValue('--font-sans').trim() ||
+        '"Inter", system-ui, sans-serif'
+      ctx.font = `500 ${px}px ${cssFont}`
+      ctx.textBaseline = 'top'
+      const lines = value.split('\n')
+      lines.forEach((line, i) => {
+        ctx.fillText(line, prev.x, prev.y + i * px * 1.15)
+      })
+      ctx.restore()
+      return null
+    })
+  }
+
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
     if (!canvas) return
+    if (tool === 'text') {
+      if (textBox) commitTextBox()
+      const p = pointerPos(e)
+      setTextBox({ x: p.x, y: p.y, value: '' })
+      return
+    }
     canvas.setPointerCapture(e.pointerId)
     pushSnapshot()
     drawingRef.current = true
@@ -155,6 +198,7 @@ export function Whiteboard({ open, onClose }: Props) {
   }
 
   const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (tool === 'text') return
     if (!drawingRef.current || !lastRef.current) return
     const p = pointerPos(e)
     drawSegment(lastRef.current, p)
@@ -199,7 +243,10 @@ export function Whiteboard({ open, onClose }: Props) {
             type="button"
             className="wb__tool"
             data-active={tool === 'pen'}
-            onClick={() => setTool('pen')}
+            onClick={() => {
+              if (textBox) commitTextBox()
+              setTool('pen')
+            }}
             aria-label="Lápiz"
             title="Lápiz"
           >
@@ -209,11 +256,24 @@ export function Whiteboard({ open, onClose }: Props) {
             type="button"
             className="wb__tool"
             data-active={tool === 'eraser'}
-            onClick={() => setTool('eraser')}
+            onClick={() => {
+              if (textBox) commitTextBox()
+              setTool('eraser')
+            }}
             aria-label="Goma"
             title="Goma"
           >
             ⌫
+          </button>
+          <button
+            type="button"
+            className="wb__tool"
+            data-active={tool === 'text'}
+            onClick={() => setTool('text')}
+            aria-label="Texto"
+            title="Texto"
+          >
+            T
           </button>
         </div>
 
@@ -302,6 +362,34 @@ export function Whiteboard({ open, onClose }: Props) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         />
+        {textBox && (
+          <input
+            ref={textInputRef}
+            className="wb__text-input"
+            value={textBox.value}
+            onChange={(e) => setTextBox((t) => (t ? { ...t, value: e.target.value } : t))}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                commitTextBox()
+              } else if (e.key === 'Escape') {
+                e.preventDefault()
+                e.stopPropagation()
+                setTextBox(null)
+              }
+            }}
+            onBlur={() => commitTextBox()}
+            style={{
+              left: textBox.x,
+              top: textBox.y,
+              color,
+              fontSize: fontPxFor(size),
+              caretColor: color,
+            }}
+            placeholder="Escribí…"
+            aria-label="Texto en pizarra"
+          />
+        )}
       </div>
     </div>
   )

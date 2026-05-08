@@ -36,10 +36,21 @@ const CAT_LABEL: Record<Category, string> = {
   hyper: '≥ 1.000 % (hiper)',
 }
 
+const YEAR_MIN = argentinaInflation[0].year
+const YEAR_MAX = argentinaInflation[argentinaInflation.length - 1].year
+
+const PRESETS: { label: string; range: [number, number] }[] = [
+  { label: 'Completo', range: [YEAR_MIN, YEAR_MAX] },
+  { label: 'Sin hiper (1991+)', range: [1991, YEAR_MAX] },
+  { label: 'Convertibilidad (1991–2001)', range: [1991, 2001] },
+  { label: 'Post-2002', range: [2002, YEAR_MAX] },
+]
+
 export function ArgentinaInflationSlide() {
   const [scale, setScale] = useState<Scale>('linear')
   const [active, setActive] = useState<Set<Category>>(new Set(ALL_CATS))
   const [tip, setTip] = useState<Tooltip | null>(null)
+  const [yearRange, setYearRange] = useState<[number, number]>([YEAR_MIN, YEAR_MAX])
   const svgRef = useRef<SVGSVGElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const [size, setSize] = useState({ w: 900, h: 380 })
@@ -58,7 +69,10 @@ export function ArgentinaInflationSlide() {
     return () => ro.disconnect()
   }, [])
 
-  const data = useMemo(() => argentinaInflation, [])
+  const data = useMemo(
+    () => argentinaInflation.filter((d) => d.year >= yearRange[0] && d.year <= yearRange[1]),
+    [yearRange],
+  )
 
   const toggleCat = (c: Category) => {
     setActive((prev) => {
@@ -74,6 +88,7 @@ export function ArgentinaInflationSlide() {
     if (!svgRef.current) return
     const svg = d3.select(svgRef.current)
     svg.selectAll('*').remove()
+    if (data.length === 0) return
 
     const margin = { top: 24, right: 24, bottom: 44, left: 64 }
     const width = size.w - margin.left - margin.right
@@ -260,6 +275,66 @@ export function ArgentinaInflationSlide() {
               <i style={{ background: CAT_COLOR[c] }} /> {CAT_LABEL[c]}
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="infl-range" aria-label="Filtro de rango de años">
+        <div className="infl-range__head">
+          <span className="infl-range__label">Rango de años</span>
+          <span className="infl-range__values">
+            <strong>{yearRange[0]}</strong> – <strong>{yearRange[1]}</strong>
+          </span>
+        </div>
+        <div className="infl-range__slider">
+          <div
+            className="infl-range__fill"
+            style={{
+              left: `${((yearRange[0] - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * 100}%`,
+              right: `${100 - ((yearRange[1] - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * 100}%`,
+            }}
+          />
+          <input
+            type="range"
+            min={YEAR_MIN}
+            max={YEAR_MAX}
+            step={1}
+            value={yearRange[0]}
+            aria-label="Año inicial"
+            onChange={(e) => {
+              const v = Math.min(Number(e.target.value), yearRange[1])
+              setYearRange([v, yearRange[1]])
+            }}
+            className="infl-range__input infl-range__input--min"
+          />
+          <input
+            type="range"
+            min={YEAR_MIN}
+            max={YEAR_MAX}
+            step={1}
+            value={yearRange[1]}
+            aria-label="Año final"
+            onChange={(e) => {
+              const v = Math.max(Number(e.target.value), yearRange[0])
+              setYearRange([yearRange[0], v])
+            }}
+            className="infl-range__input infl-range__input--max"
+          />
+        </div>
+        <div className="infl-range__presets">
+          {PRESETS.map((p) => {
+            const isActive = yearRange[0] === p.range[0] && yearRange[1] === p.range[1]
+            return (
+              <button
+                key={p.label}
+                type="button"
+                className="infl-range__preset"
+                data-active={isActive}
+                onClick={() => setYearRange(p.range)}
+              >
+                {p.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 

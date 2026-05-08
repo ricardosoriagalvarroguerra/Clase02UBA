@@ -136,6 +136,26 @@
 }
 .wb__canvas[data-tool='pen'] { cursor: crosshair; }
 .wb__canvas[data-tool='eraser'] { cursor: cell; }
+.wb__canvas[data-tool='text'] { cursor: text; }
+
+.wb__text-input {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  outline: none;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1.15;
+  min-width: 140px;
+  box-shadow: var(--shadow-sm);
+  transform: translate(-3px, -3px);
+}
+.wb__text-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
 
 .wb-toggle {
   position: fixed;
