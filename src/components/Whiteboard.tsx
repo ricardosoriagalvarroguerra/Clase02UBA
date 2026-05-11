@@ -271,7 +271,7 @@ export function Whiteboard({ open, onClose }: Props) {
             data-active={tool === 'text'}
             onClick={() => setTool('text')}
             aria-label="Texto"
-            title="Texto"
+            title="Texto · hacé clic en cualquier parte del lienzo y escribí"
           >
             T
           </button>
@@ -362,11 +362,17 @@ export function Whiteboard({ open, onClose }: Props) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         />
+        {tool === 'text' && !textBox && (
+          <div className="wb__hint" role="status">
+            Hacé clic en cualquier parte del lienzo y empezá a escribir
+          </div>
+        )}
         {textBox && (
           <input
             ref={textInputRef}
             className="wb__text-input"
             value={textBox.value}
+            size={Math.max(textBox.value.length || 1, 1)}
             onChange={(e) => setTextBox((t) => (t ? { ...t, value: e.target.value } : t))}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
